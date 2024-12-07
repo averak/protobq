@@ -1,3 +1,5 @@
 # protobq
 
-A tool for schema-driven development in BigQuery using Protocol Buffers.
+![CI](https://github.com/averak/protobq/workflows/CI/badge.svg)
+
+A tool for idempotent schema management in BigQuery using Protocol Buffers.
