@@ -11,16 +11,16 @@ test:
 format:
 	go fmt ./...
 	golangci-lint run --issues-exit-code=0 --fix ./...
-	# buf format --write
+	buf format --write
 
 BREAKING_CHANGE_BASE_BRANCH?=develop
 .PHONY: lint
 lint:
 	golangci-lint run --issues-exit-code=1 ./...
-	# buf lint
+	buf lint
 	# buf breaking --against '.git#branch=$(BREAKING_CHANGE_BASE_BRANCH)'
 
 .PHONY: codegen
 codegen:
-	# find . -type f \( -name '*.pb.go' \) -delete
-	# buf generate
+	find . -type f \( -name '*.pb.go' \) -delete
+	buf generate

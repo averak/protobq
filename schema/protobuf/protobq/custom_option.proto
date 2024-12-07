@@ -1,0 +1,22 @@
+syntax = "proto3";
+package protobq;
+
+import "google/protobuf/descriptor.proto";
+
+message MaterializedView {
+  bool enable_refresh = 1;
+  int32 refresh_interval_minutes = 2;
+}
+
+message Field {
+  bool is_partitioned = 1;
+  bool is_clustered = 2;
+}
+
+extend google.protobuf.MessageOptions {
+  MaterializedView materialized_view = 50000;
+}
+
+extend google.protobuf.FieldOptions {
+  Field field = 50000;
+}

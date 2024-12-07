@@ -3,8 +3,8 @@ managed:
   enabled: true
   override:
     - file_option: go_package_prefix
-      value: github.com/averak/protobq/protobuf
+      value: github.com/averak/protobq/internal/protobuf
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.35.2
-    out: protobuf
+    out: internal/protobuf
     opt: paths=source_relative
