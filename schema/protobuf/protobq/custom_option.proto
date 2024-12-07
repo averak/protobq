@@ -4,11 +4,12 @@ package protobq;
 import "google/protobuf/descriptor.proto";
 
 message MaterializedView {
-  bool enable_refresh = 1;
-  int32 refresh_interval_minutes = 2;
+  bool is_materialized_view = 1;
+  bool enable_refresh = 2;
+  int32 refresh_interval_minutes = 3;
 }
 
-message Field {
+message MaterializedViewField {
   bool is_partitioned = 1;
   bool is_clustered = 2;
 }
@@ -18,5 +19,5 @@ extend google.protobuf.MessageOptions {
 }
 
 extend google.protobuf.FieldOptions {
-  Field field = 50000;
+  MaterializedViewField materialized_view_field = 50000;
 }
