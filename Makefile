@@ -1,5 +1,6 @@
 .PHONY: install-tools
 install-tools:
+	go install ./cmd/protoc-gen-protobq
 	go install github.com/bufbuild/buf/cmd/buf@v1.47.2
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
@@ -21,6 +22,6 @@ lint:
 	# buf breaking --against '.git#branch=$(BREAKING_CHANGE_BASE_BRANCH)'
 
 .PHONY: codegen
-codegen:
-	find . -type f \( -name '*.pb.go' \) -delete
+codegen: install-tools
+	find . -type f \( -name '*.pb.go' -or -name '*.protobq.go' \) -delete
 	buf generate

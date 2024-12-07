@@ -8,3 +8,6 @@ plugins:
   - remote: buf.build/protocolbuffers/go:v1.35.2
     out: internal/protobuf
     opt: paths=source_relative
+  - local: protoc-gen-protobq
+    out: internal/protobuf
+    opt: paths=source_relative
