@@ -4,14 +4,33 @@ package example;
 import "google/protobuf/timestamp.proto";
 import "protobq/custom_option.proto";
 
-message Example {
+message View1 {
   option (protobq.materialized_view) = {
     is_materialized_view: true
     enable_refresh: true
     refresh_interval_minutes: 10
   };
 
-  google.protobuf.Timestamp timestamp = 1 [(protobq.materialized_view_field) = {is_partitioned: true}];
-  string user_id = 2 [(protobq.materialized_view_field) = {is_clustered: true}];
-  string message = 3;
+  google.protobuf.Timestamp timestamp = 1 [(protobq.materialized_view_field) = {
+    source: {
+      table: "example"
+      field: "timestamp"
+    }
+    is_partitioned: true
+  }];
+
+  string user_id = 2 [(protobq.materialized_view_field) = {
+    source: {
+      table: "example"
+      field: "user_id"
+    }
+    is_clustered: true
+  }];
+
+  string message = 3 [(protobq.materialized_view_field) = {
+    source: {
+      table: "example"
+      field: "message"
+    }
+  }];
 }
