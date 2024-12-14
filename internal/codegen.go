@@ -1,38 +1,41 @@
 package internal
 
 import (
+	"fmt"
 	"runtime/debug"
+	"slices"
+	"strings"
 
 	"github.com/averak/protobq/internal/protobuf/protobq"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 )
 
-//goland:noinspection GoSnakeCaseUsage
 var (
 	timeIdents = struct {
-		Duration protogen.GoIdent
+		Minute protogen.GoIdent
 	}{
-		Duration: protogen.GoImportPath("time").Ident("Duration"),
-	}
-	protoIdents = struct {
-		GetExtension protogen.GoIdent
-	}{
-		GetExtension: protogen.GoImportPath("google.golang.org/protobuf/proto").Ident("GetExtension"),
-	}
-	internalIdents = struct {
-		MaterializedView   protogen.GoIdent
-		E_MaterializedView protogen.GoIdent
-	}{
-		MaterializedView:   protogen.GoImportPath("github.com/averak/protobq/internal/protobuf/protobq").Ident("MaterializedView"),
-		E_MaterializedView: protogen.GoImportPath("github.com/averak/protobq/internal/protobuf/protobq").Ident("E_MaterializedView"),
+		Minute: protogen.GoImportPath("time").Ident("Minute"),
 	}
 	protobqIdents = struct {
 		MaterializedView        protogen.GoIdent
 		MaterializedViewOptions protogen.GoIdent
+		InsertDTO               protogen.GoIdent
+		internal                struct {
+			NewInsertDTOImpl protogen.GoIdent
+			BQField          protogen.GoIdent
+		}
 	}{
 		MaterializedView:        protogen.GoImportPath("github.com/averak/protobq").Ident("MaterializedView"),
 		MaterializedViewOptions: protogen.GoImportPath("github.com/averak/protobq").Ident("MaterializedViewOptions"),
+		InsertDTO:               protogen.GoImportPath("github.com/averak/protobq").Ident("InsertDTO"),
+		internal: struct {
+			NewInsertDTOImpl protogen.GoIdent
+			BQField          protogen.GoIdent
+		}{
+			NewInsertDTOImpl: protogen.GoImportPath("github.com/averak/protobq/internal").Ident("NewInsertDTOImpl"),
+			BQField:          protogen.GoImportPath("github.com/averak/protobq/internal").Ident("BQField"),
+		},
 	}
 )
 
@@ -69,17 +72,38 @@ func (g CodeGenerator) Gen() error {
 			if !g.isMaterializedViewSchema(msg) {
 				continue
 			}
+			ext, _ := proto.GetExtension(msg.Desc.Options(), protobq.E_MaterializedView).(*protobq.MaterializedView)
 
 			gf.P("var _ ", protobqIdents.MaterializedView, " = (*", msg.GoIdent.GoName, ")(nil)")
 			gf.P()
+
+			gf.P("func (mv *", msg.GoIdent.GoName, ") Name() string {")
+			gf.P("    return \"", msg.Desc.Name(), "\"")
+			gf.P("}")
+			gf.P()
+
 			gf.P("func (mv *", msg.GoIdent.GoName, ") Options() ", protobqIdents.MaterializedViewOptions, " {")
-			gf.P("    ext, _ := ", protoIdents.GetExtension, "(mv.ProtoReflect().Descriptor().Options(), ", internalIdents.E_MaterializedView, ").(*", internalIdents.MaterializedView, ")")
 			gf.P("    return ", protobqIdents.MaterializedViewOptions, "{")
-			gf.P("        EnableRefresh: ext.GetEnableRefresh(),")
-			gf.P("        RefreshInterval: ", timeIdents.Duration, "(ext.GetRefreshIntervalMinutes()) * time.Minute,")
+			gf.P("        EnableRefresh: ", ext.GetEnableRefresh(), ",")
+			gf.P("        RefreshInterval: ", ext.GetRefreshIntervalMinutes(), " * ", timeIdents.Minute, ",")
 			gf.P("    }")
 			gf.P("}")
 			gf.P()
+
+			gf.P("func (mv *", msg.GoIdent.GoName, ") InsertDTO() ", protobqIdents.InsertDTO, " {")
+			gf.P("    res := ", protobqIdents.internal.NewInsertDTOImpl, "(\"", ext.GetBaseTable(), "\", nil)")
+			for _, field := range msg.Fields {
+				g.generateAddField(gf, field, nil, "res", "mv")
+			}
+			gf.P("    return res")
+			gf.P("}")
+			gf.P()
+
+			//for _, field := range msg.Fields {
+			//fieldExt, _ := proto.GetExtension(field.Desc.Options(), protobq.E_MaterializedViewField).(*protobq.MaterializedViewField)
+			//if fieldExt != nil {
+			//	gf.P("    res[\"", field.Desc.Name(), "\"] = mv.", field.GoName)
+			//}
 		}
 	}
 	return nil
@@ -100,9 +124,31 @@ func (g CodeGenerator) isMaterializedViewSchema(msg *protogen.Message) bool {
 		return false
 	}
 
-	ext, ok := proto.GetExtension(opts, protobq.E_MaterializedView).(*protobq.MaterializedView)
-	if !ok {
-		return false
+	ext, _ := proto.GetExtension(opts, protobq.E_MaterializedView).(*protobq.MaterializedView)
+	return ext != nil
+}
+
+func (g CodeGenerator) generateAddField(gf *protogen.GeneratedFile, field *protogen.Field, parentPaths []string, result string, receiver string) {
+	ext, _ := proto.GetExtension(field.Desc.Options(), protobq.E_MaterializedViewField).(*protobq.MaterializedViewField)
+	if ext == nil {
+		ext = &protobq.MaterializedViewField{}
 	}
-	return ext.GetIsMaterializedView()
+
+	paths := parentPaths
+	if len(ext.GetOriginPath()) > 0 {
+		paths = append(paths, ext.GetOriginPath()...)
+	} else {
+		paths = append(paths, string(field.Desc.Name()))
+	}
+
+	blacklist := []string{
+		"google.protobuf.Timestamp",
+	}
+	if field.Message != nil && !slices.Contains(blacklist, string(field.Message.Desc.FullName())) {
+		for _, nestedField := range field.Message.Fields {
+			g.generateAddField(gf, nestedField, paths, result, receiver+".Get"+field.GoName+"()")
+		}
+	} else {
+		gf.P(result, ".AddField(", protobqIdents.internal.BQField, "{[]string{", fmt.Sprintf(`"%s"`, strings.Join(paths, `", "`)), "}, ", receiver, ".Get", field.GoName, "()})")
+	}
 }

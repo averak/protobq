@@ -67,29 +67,21 @@ import "google/protobuf/timestamp.proto";
 
 message View1 {
   option (protobq.materialized_view) = {
-    is_materialized_view: true
+    base_table: "example"
     enable_refresh: true
   };
 
   google.protobuf.Timestamp timestamp = 1 [(protobq.materialized_view_field) = {
-    source: {
-      table: "example"
-      field: "timestamp"
-    }
+    origin_path: "timestamp"
     is_partitioned: true
   }];
-
-  string message = 3 [(protobq.materialized_view_field) = {
-    source: {
-      table: "example"
-      field: "message"
-    }
-  }];
+  
+  string message = 2;
 }
 ```
 
-### 2. Apply schema
+#### 2. Apply schema
 
 ```shell
-protobq apply -i example/view1.proto --project-id {YOUR_PROJECT_ID}
+protobq apply -i example/view1.proto --project-id {YOUR_PROJECT_ID} --dataset-id {YOUR_DATASET_ID}
 ```
