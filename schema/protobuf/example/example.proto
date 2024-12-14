@@ -2,7 +2,7 @@ syntax = "proto3";
 package example;
 
 import "google/protobuf/timestamp.proto";
-import "protobq/custom_option.proto";
+import "protobq/protobq.proto";
 
 message View1 {
   option (protobq.materialized_view) = {
