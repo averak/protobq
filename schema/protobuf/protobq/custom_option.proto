@@ -10,8 +10,13 @@ message MaterializedView {
 }
 
 message MaterializedViewField {
-  bool is_partitioned = 1;
-  bool is_clustered = 2;
+  message Source {
+    string table = 1;
+    string field = 2;
+  }
+  Source source = 1;
+  bool is_partitioned = 2;
+  bool is_clustered = 3;
 }
 
 extend google.protobuf.MessageOptions {

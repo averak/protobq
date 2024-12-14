@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
+	"github.com/averak/protobq/internal"
 	"github.com/urfave/cli"
 )
 
@@ -21,8 +23,17 @@ func newCliApp() *cli.App {
 		{
 			Name:  "apply",
 			Usage: "apply schema",
+			Flags: []cli.Flag{
+				&cli.StringFlag{
+					Name:     "project-id",
+					Required: true,
+				},
+			},
 			Action: func(c *cli.Context) error {
-				// TODO: implements me
+				err := internal.Apply(context.Background(), c.String("project-id"))
+				if err != nil {
+					return err
+				}
 				return nil
 			},
 		},

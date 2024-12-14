@@ -10,9 +10,9 @@ import (
 	time "time"
 )
 
-var _ protobq.MaterializedView = (*Example)(nil)
+var _ protobq.MaterializedView = (*View1)(nil)
 
-func (mv *Example) Options() protobq.MaterializedViewOptions {
+func (mv *View1) Options() protobq.MaterializedViewOptions {
 	ext, _ := proto.GetExtension(mv.ProtoReflect().Descriptor().Options(), protobq1.E_MaterializedView).(*protobq1.MaterializedView)
 	return protobq.MaterializedViewOptions{
 		EnableRefresh:   ext.GetEnableRefresh(),
