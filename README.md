@@ -44,3 +44,52 @@ Key features:
 
 - **Consistency and Reusability**  
   A single base table ensures data integrity and facilitates schema reuse across multiple materialized views.
+
+## Quick Start
+
+### Installation
+
+```shell
+go install github.com/averak/protobq/cmd/protobq@latest
+```
+
+### Usage
+
+#### 1. Define schema
+
+```protobuf
+syntax = "proto3";
+
+package example;
+
+import "averak/protobq/protobq.proto";
+import "google/protobuf/timestamp.proto";
+
+message View1 {
+  option (protobq.materialized_view) = {
+    is_materialized_view: true
+    enable_refresh: true
+  };
+
+  google.protobuf.Timestamp timestamp = 1 [(protobq.materialized_view_field) = {
+    source: {
+      table: "example"
+      field: "timestamp"
+    }
+    is_partitioned: true
+  }];
+
+  string message = 3 [(protobq.materialized_view_field) = {
+    source: {
+      table: "example"
+      field: "message"
+    }
+  }];
+}
+```
+
+### 2. Apply schema
+
+```shell
+protobq apply -i example/view1.proto --project-id {YOUR_PROJECT_ID}
+```
