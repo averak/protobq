@@ -98,12 +98,6 @@ func (g CodeGenerator) Gen() error {
 			gf.P("    return res")
 			gf.P("}")
 			gf.P()
-
-			//for _, field := range msg.Fields {
-			//fieldExt, _ := proto.GetExtension(field.Desc.Options(), protobq.E_MaterializedViewField).(*protobq.MaterializedViewField)
-			//if fieldExt != nil {
-			//	gf.P("    res[\"", field.Desc.Name(), "\"] = mv.", field.GoName)
-			//}
 		}
 	}
 	return nil
