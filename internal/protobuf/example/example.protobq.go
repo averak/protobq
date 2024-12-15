@@ -17,6 +17,7 @@ func (mv *View1) Name() string {
 
 func (mv *View1) Options() protobq.MaterializedViewOptions {
 	return protobq.MaterializedViewOptions{
+		BaseTable:       "example",
 		EnableRefresh:   true,
 		RefreshInterval: 0 * time.Minute,
 	}
