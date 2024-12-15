@@ -4,18 +4,25 @@ package protobq;
 import "google/protobuf/descriptor.proto";
 
 message MaterializedView {
-  bool is_materialized_view = 1;
+  // マテビューが参照するベーステーブル名
+  string base_table = 1;
+
+  // マテビューの自動更新の有効化フラグ。
   bool enable_refresh = 2;
+
+  // マテビューの自動更新間隔 [分]。
   int32 refresh_interval_minutes = 3;
 }
 
 message MaterializedViewField {
-  message Source {
-    string table = 1;
-    string field = 2;
-  }
-  Source source = 1;
+  // フィールドの参照元パス。
+  // デフォルト: [message_name, field_paths...]
+  repeated string origin_path = 1;
+
+  // このフィールドが、パーティション列であるかどうか。
   bool is_partitioned = 2;
+
+  // このフィールドが、クラスタ化列であるかどうか。
   bool is_clustered = 3;
 }
 

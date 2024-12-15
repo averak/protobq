@@ -35,9 +35,14 @@ func newCliApp() *cli.App {
 					Usage:    "google cloud project id",
 					Required: true,
 				},
+				&cli.StringFlag{
+					Name:     "dataset-id",
+					Usage:    "bigquery dataset id",
+					Required: true,
+				},
 			},
 			Action: func(c *cli.Context) error {
-				err := internal.Apply(context.Background(), c.String("project-id"))
+				err := internal.Apply(context.Background(), c.String("project-id"), c.String("dataset-id"))
 				if err != nil {
 					return err
 				}
@@ -57,6 +62,11 @@ func newCliApp() *cli.App {
 				&cli.StringFlag{
 					Name:     "project-id",
 					Usage:    "google cloud project id",
+					Required: true,
+				},
+				&cli.StringFlag{
+					Name:     "dataset-id",
+					Usage:    "bigquery dataset id",
 					Required: true,
 				},
 			},

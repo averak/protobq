@@ -5,17 +5,30 @@ package example
 
 import (
 	protobq "github.com/averak/protobq"
-	protobq1 "github.com/averak/protobq/internal/protobuf/protobq"
-	proto "google.golang.org/protobuf/proto"
+	internal "github.com/averak/protobq/internal"
 	time "time"
 )
 
 var _ protobq.MaterializedView = (*View1)(nil)
 
+func (mv *View1) Name() string {
+	return "View1"
+}
+
 func (mv *View1) Options() protobq.MaterializedViewOptions {
-	ext, _ := proto.GetExtension(mv.ProtoReflect().Descriptor().Options(), protobq1.E_MaterializedView).(*protobq1.MaterializedView)
 	return protobq.MaterializedViewOptions{
-		EnableRefresh:   ext.GetEnableRefresh(),
-		RefreshInterval: time.Duration(ext.GetRefreshIntervalMinutes()) * time.Minute,
+		EnableRefresh:   true,
+		RefreshInterval: 0 * time.Minute,
 	}
+}
+
+func (mv *View1) InsertDTO() protobq.InsertDTO {
+	res := internal.NewInsertDTOImpl("example", nil)
+	res.AddField(internal.BQField{[]string{"timestamp"}, mv.GetTimestamp()})
+	res.AddField(internal.BQField{[]string{"clustered_field"}, mv.GetClusteredField()})
+	res.AddField(internal.BQField{[]string{"repeated_field"}, mv.GetRepeatedField()})
+	res.AddField(internal.BQField{[]string{"nested_field", "string_field"}, mv.GetNestedField().GetStringField()})
+	res.AddField(internal.BQField{[]string{"nested_field", "int64_field"}, mv.GetNestedField().GetInt64Field()})
+	res.AddField(internal.BQField{[]string{"nested_field", "bool_field"}, mv.GetNestedField().GetBoolField()})
+	return res
 }
