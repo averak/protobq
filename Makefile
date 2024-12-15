@@ -1,6 +1,6 @@
 .PHONY: install-tools
 install-tools:
-	go install ./cmd/protoc-gen-protobq
+	go install ./cmd/protoc-gen-go-protobq
 	go install github.com/bufbuild/buf/cmd/buf@v1.47.2
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
