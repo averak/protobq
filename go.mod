@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	cloud.google.com/go/bigquery v1.65.0
+	github.com/bufbuild/protocompile v0.14.1
 	github.com/urfave/cli/v2 v2.27.5
 	google.golang.org/api v0.214.0
 	google.golang.org/protobuf v1.36.0
@@ -33,7 +34,6 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.58.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0 // indirect

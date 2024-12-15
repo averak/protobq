@@ -42,7 +42,7 @@ func newCliApp() *cli.App {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				err := internal.Apply(context.Background(), c.String("project-id"), c.String("dataset-id"))
+				err := internal.Apply(context.Background(), c.String("project-id"), c.String("dataset-id"), c.String("input"))
 				if err != nil {
 					return err
 				}

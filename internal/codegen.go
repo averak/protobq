@@ -84,6 +84,7 @@ func (g CodeGenerator) Gen() error {
 
 			gf.P("func (mv *", msg.GoIdent.GoName, ") Options() ", protobqIdents.MaterializedViewOptions, " {")
 			gf.P("    return ", protobqIdents.MaterializedViewOptions, "{")
+			gf.P("        BaseTable: \"", ext.GetBaseTable(), "\",")
 			gf.P("        EnableRefresh: ", ext.GetEnableRefresh(), ",")
 			gf.P("        RefreshInterval: ", ext.GetRefreshIntervalMinutes(), " * ", timeIdents.Minute, ",")
 			gf.P("    }")
